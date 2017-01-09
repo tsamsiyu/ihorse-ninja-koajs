@@ -1,11 +1,7 @@
-const Router = require('koa-router');
+export default function (router) {
+    router.get('/sign-up', async (ctx, next) => {
+        ctx.body = {test: true};
+    });
 
-const router = new Router({
-    prefix: '/users'
-});
-
-router.get('/', async (ctx, next) => {
-    ctx.body = 'users';
-});
-
-export default router;
+    return router;
+};

@@ -1,9 +1,10 @@
 import usersRouter from 'routes/users';
+import Router from 'components/router';
 
 export default function (app) {
-    app.use(usersRouter.routes());
+    const router = new Router;
 
-    app.use(async (ctx, next) => {
-        ctx.body = 'Hello world';
+    router.namespace('/v1', (v1) => {
+        app.use(usersRouter(v1).routes());
     });
 };
