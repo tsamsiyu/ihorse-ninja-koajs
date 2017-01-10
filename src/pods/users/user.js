@@ -1,13 +1,13 @@
-import mongoose from 'mongoose';
+import mongoose from 'components/mongoose';
 import crypto from 'crypto';
 
 const {Schema} = mongoose;
 
 const schema = new Schema({
-    username: {type: String, unique: true, required: true},
-    email: {type: String, unique: true, required: true},
+    username: {type: String, unique: true, sparse: true, trim: true, index: true},
+    email: {type: String, required: true, unique: true, trim: true, index: true},
     hashedPassword: {type: String, required: true},
-    authToken: {type: String, unique: true, required: true},
+    authToken: {type: String, required: true},
     salt: {type: String, required: true},
     createdAt: {type: Date, default: Date.now}
 });

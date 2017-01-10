@@ -1,60 +1,90 @@
-var mongoose        = require('./../mongoose');
-var connStates      = require('mongoose/lib/connectionstate');
+import mongoose from 'components/mongoose';
+import connStates from'mongoose/lib/connectionstate';
 
-var uniqueValidator = function (value, options, field, hash) {
-    var collectionName, collectionField;
-    var isOptionsObject = options instanceof Object;
-
-    if (isOptionsObject && options.collection) {
-        collectionName = options.collection;
+const getCollectionName = function (options) {
+    if (typeof options === 'object' && options.collection) {
+        return options.collection;
     } else if (typeof options === 'string') {
-        collectionName = options;
-    } else if (hash.constructor.collection) {
-        collectionName = hash.constructor.collection.collectionName;
+        return options;
     } else {
         throw new Error('Collection name must be specified for unique validator');
     }
-
-    if (isOptionsObject && options.field) {
-        collectionField = options.field;
-    } else {
-        collectionField = field;
-    }
-
-    return new Promise(function (resolve, reject) {
-        if (!value) resolve();
-        var conditions = {};
-        conditions[collectionField] = value;
-
-        try {
-            if (mongoose.connection.readyState == connStates.connected) {
-                _mustUnique(resolve, collectionName, conditions);
-            } else {
-                mongoose.connection.once('open', function () {
-                    _mustUnique(resolve, collectionName, conditions);
-                });
-            }
-        } catch (e) {
-            resolve('was broken')
-        }
-    });
 };
 
-var _mustUnique = function (resolve, collectionName, conditions) {
-    var db = mongoose.connection.db;
-    db.collection(collectionName, function (err, collection) {
-        collection.count(conditions, function (err, cnt) {
+const getCollectionField = function (options) {
+    if (typeof options === 'object' && options.field) {
+        return options.field;
+    }
+};
+
+const getFilter = function (options, field, value) {
+    let filter;
+    if (typeof options === 'object' && options.filter) {
+        filter = options.filter;
+    } else {
+        filter = {};
+    }
+    filter[field] = value;
+    return filter;
+};
+
+const checkCollectionUniqueness = function (collection, filter) {
+    return new Promise((resolve, reject) => {
+        collection.count(filter, function (err, cnt) {
             if (err) {
-                resolve('cannot be checked, sorry');
+                reject(err);
+            } else if (cnt) {
+                resolve('already exists');
             } else {
-                if (cnt) {
-                    resolve('already exists');
-                } else {
-                    resolve();
-                }
+                resolve();
             }
         });
     });
 };
 
-module.exports = uniqueValidator;
+/**
+ * Expects the opened mongoose connection
+ *
+ * @param {String} collectionName
+ * @param {Object} filter
+ */
+const executeUniquenessQuery = function (collectionName, filter) {
+    const db = mongoose.connection.db;
+    return new Promise((resolve, reject) => {
+        db.collection(collectionName, (err, collection) => {
+            if (err) {
+                reject(err);
+            } else {
+                checkCollectionUniqueness(collection, filter)
+                    .then(resolve)
+                    .catch(reject);
+            }
+        });
+    });
+};
+
+const checkUniqueness = function (collectionName, filter) {
+    return new Promise((resolve, reject) => {
+        if (mongoose.connection.readyState == connStates.connected) {
+            executeUniquenessQuery(collectionName, filter)
+                .then(resolve)
+                .catch(reject);
+        } else {
+            mongoose.connection.once('open', () => {
+                executeUniquenessQuery(collectionName, filter)
+                    .then(resolve)
+                    .catch(reject);
+            });
+        }
+    });
+};
+
+const optionValidator = function (value, options, field, hash) {
+    if (!value) return;
+    const collectionName = getCollectionName(options);
+    const collectionField = getCollectionField(options) || field;
+    const filter = getFilter(options, collectionField, value);
+    return checkUniqueness(collectionName, filter);
+};
+
+export default optionValidator;

@@ -1,7 +1,7 @@
 import validationManager from 'validate.js';
-import uniqueValidator from 'components/validator/unique';
-import datetimeValidator from 'components/validator/datetime';
-import presenceValidator from 'components/validator/presence';
+import uniqueValidator from 'components/validation/unique';
+import datetimeValidator from 'components/validation/datetime';
+import presenceValidator from 'components/validation/presence';
 
 validationManager.async.options = {
     cleanAttributes: false
