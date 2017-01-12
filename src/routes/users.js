@@ -14,7 +14,6 @@ export default function (router) {
                 }
             })
             .catch((error) => {
-                console.log('error', error);
                 ctx.throw(err, 500);
             });
     });

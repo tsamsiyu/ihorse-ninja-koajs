@@ -9,4 +9,4 @@ const schema = new Schema({
     userId: Schema.Types.ObjectId,
 });
 
-export default mongoose.model('Profile', schema);
+export default UsersProvider.model('Profile', schema);
