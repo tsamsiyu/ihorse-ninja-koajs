@@ -1,17 +1,20 @@
 import _ from 'lodash';
-import JADataPicker from 'ja-data-picker';
-import JAObject from 'ja-object';
+import JAO from 'jao';
 
-function ResourceSpecification(manager, specification) {
+function ResourceSpecification(manager, type, specification) {
     this.manager = manager;
+    this.type = type;
+    this.id = 'id';
     if (typeof specification === 'object') {
-        this.id = specification.id || 'id';
+        if (specification.id) this.id = specification.id;
         this.attributes = specification.attributes || [];
         this.relationships = specification.relationships || [];
+        this.relationshipsSerializers = specification.relationshipsSerializers || {};
         this.included = [];
     }
 }
 
+// TODO: think about make it immutable
 ResourceSpecification.prototype.attributesOnly = function (list) {
     this.attributes = list;
     return this;
@@ -46,18 +49,18 @@ ResourceSpecification.prototype.serialize = function (mock) {
 };
 
 ResourceSpecification.prototype.serializeSingle = function (mock) {
-    const jaDataPicker = new JADataPicker(this, mock);
+    const jaoPicker = this.manager.getPickerFor(this.type);
     const jaFormat = {data: {}, included: []};
-    jaFormat.data.id = jaDataPicker.getId();
-    jaFormat.data.attributes = jaDataPicker.getAttributes();
-    jaFormat.data.relationships = jaDataPicker.getRelationships();
+    jaFormat.data.id = jaoPicker.getId();
+    jaFormat.data.attributes = jaoPicker.getAttributes();
+    jaFormat.data.relationships = jaoPicker.getRelationships();
     this.included.forEach((relationshipName) => { // TODO: take deep relationship into account
         const relationshipMock = mock[relationshipName];
         const relationshipResourceSpecification = this.getRelationshipResourceSpecification(relationshipName);
         const relationshipJaFormat = relationshipResourceSpecification.serialize(relationshipMock);
         jaFormat.included.push(relationshipJaFormat);
     });
-    return new JAObject(jaFormat);
+    return new JAO(jaFormat);
 };
 
 ResourceSpecification.prototype.serializeCollection = function (mocks) {

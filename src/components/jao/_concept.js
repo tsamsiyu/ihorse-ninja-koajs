@@ -12,7 +12,8 @@ const userResourceSpec = registerResourceSpecification('users', {
     included: ['profile'],
     relationshipsSerializers: { // you can override default serializers
         'posts': postResourceSpec,
-        'posts.comments': commentResourceSpec
+        'posts.comments': commentResourceSpec,
+        'library': 'books' // map name of relationship to type of resource
     }
 });
 
