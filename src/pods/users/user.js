@@ -36,4 +36,4 @@ schema.virtual('profile', {
     foreignField: 'userId'
 });
 
-export default UsersProvider.model('User', schema);
+export default mongoose.model('User', schema);

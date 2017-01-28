@@ -1,6 +1,15 @@
 import signUpAction from 'pods/users/actions/sign-up-action';
+import signInAction from 'pods/users/actions/sign-in-action';
 
 export default function (router) {
+    router.options('/sign-up', async (ctx) => {
+        ctx.body = 'ok';
+    });
+
+    router.options('/sign-in', async (ctx) => {
+        ctx.body = 'ok';
+    });
+
     router.post('/sign-up', async (ctx, next) => {
         await signUpAction(ctx.request.body)
             .then((response) => {
@@ -14,7 +23,24 @@ export default function (router) {
                 }
             })
             .catch((error) => {
-                ctx.throw(err, 500);
+                ctx.throw(error, 500);
+            });
+    });
+
+    router.post('/sign-in', async (ctx, next) => {
+        await signInAction(ctx.request.body)
+            .then((response) => {
+                const {errors, user} = response;
+                if (errors) {
+                    ctx.body = errors;
+                    ctx.status = 422;
+                } else {
+                    ctx.body = user;
+                    ctx.status = 200;
+                }
+            })
+            .catch((error) => {
+                ctx.throw(error, 500);
             });
     });
 

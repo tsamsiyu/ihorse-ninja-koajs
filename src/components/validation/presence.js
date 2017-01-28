@@ -1,6 +1,6 @@
 import v from 'validate.js';
 
-module.exports = function (hash, field, options, value) {
+module.exports = function (value, options, field, hash) {
     options = v.extend({}, this.options, options);
     let needValid = true;
     if (typeof options === 'object' && typeof options.when === 'function') {
