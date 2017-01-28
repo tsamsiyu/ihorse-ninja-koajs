@@ -1,5 +1,6 @@
 import signUpAction from 'pods/users/actions/sign-up-action';
 import signInAction from 'pods/users/actions/sign-in-action';
+import mongooseDataPolisher from 'components/data-polisher/mongoose';
 
 export default function (router) {
     router.options('/sign-up', async (ctx) => {
@@ -7,6 +8,14 @@ export default function (router) {
     });
 
     router.options('/sign-in', async (ctx) => {
+        ctx.body = 'ok';
+    });
+
+    router.options('/users', async (ctx) => {
+        ctx.body = 'ok';
+    });
+
+    router.options('/users/current', async (ctx) => {
         ctx.body = 'ok';
     });
 
@@ -42,6 +51,20 @@ export default function (router) {
             .catch((error) => {
                 ctx.throw(error, 500);
             });
+    });
+
+    router.get('/users', async (ctx, next) => {
+
+    });
+
+    router.get('/users/current', async (ctx, next) => {
+        if (ctx.req.appUser) {
+            ctx.body = mongooseDataPolisher.polish(ctx.req.appUser, {
+                ignored: ['hashedPassword', 'authToken', 'salt', 'createdAt']
+            });
+        } else {
+            ctx.throw(401);
+        }
     });
 
     return router;
