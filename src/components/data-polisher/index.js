@@ -137,7 +137,3 @@ DataPolisher.prototype.polishArray = function (list, varWay) {
         return this.polishObject(item, varWay);
     });
 };
-
-DataPolisher.prototype.getOptions = function () {
-
-};

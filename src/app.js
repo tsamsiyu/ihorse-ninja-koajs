@@ -1,4 +1,3 @@
-import 'babel-polyfill';
 import Koa from 'koa';
 import middlewares from 'middlewares';
 import initializers from 'initializers';

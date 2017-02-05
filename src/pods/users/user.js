@@ -30,10 +30,4 @@ schema.virtual('password')
         return this._plainPassword;
     });
 
-schema.virtual('profile', {
-    ref: 'Profile',
-    localField: '_id',
-    foreignField: 'userId'
-});
-
 export default mongoose.model('User', schema);

@@ -11,11 +11,15 @@ export function serialize(data, options) {
 }
 
 export function handleOptions(options) {
-    options.id = options.id ? options.id : 'id';
+    options.id = options.id ? options.id : '_id';
 }
 
 export function serializeArray(array, options) {
+    const data = array.map((item) => {
+        return serializeObjectData(null, item, options);
+    });
 
+    return {data};
 }
 
 export function serializeObject(object, options) {

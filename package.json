@@ -6,7 +6,8 @@
   "scripts": {
     "build": "babel src -d build",
     "start": "NODE_PATH=./src:./ NODE_ENV=development node index.js",
-    "watch": "nodemon --exec npm run start"
+    "watch": "nodemon --exec npm run start",
+    "seed": "NODE_PATH=./cli:./src:./ NODE_ENV=development node cli.js seed"
   },
   "author": "tsamsiyu",
   "license": "ISC",
@@ -27,6 +28,7 @@
     "lodash": "^4.17.4",
     "mongoose": "^4.7.6",
     "nconf": "^0.8.4",
+    "node-cache": "^4.1.1",
     "validate.js": "^0.11.1",
     "winston": "^2.3.0"
   }

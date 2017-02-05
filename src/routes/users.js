@@ -66,6 +66,4 @@ export default function (router) {
             ctx.throw(401);
         }
     });
-
-    return router;
 };
