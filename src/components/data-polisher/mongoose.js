@@ -1,6 +1,5 @@
 import DataPolisher from 'components/data-polisher';
 import Serializable from 'components/jao/serializable';
-import SerializableList from 'components/jao/serializable-list';
 
 export default class MongoosePolisher extends DataPolisher {
     polish(data) {
@@ -8,10 +7,8 @@ export default class MongoosePolisher extends DataPolisher {
         this.ignore('__v');
         return super.polish(...arguments);
     }
-    polishArray() {
-        return new SerializableList(super.polishArray(...arguments));
-    }
-    handlePolishedObject(hash, object) {
+    handlePolishedData(hash, data) {
+        const object = Array.isArray(data) ? data[0] : data;
         return new Serializable(object.constructor.collection.name, hash);
     }
     toPlainObject(object) {

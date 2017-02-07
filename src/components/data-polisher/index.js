@@ -91,19 +91,17 @@ DataPolisher.prototype.isId = function (key) {
 };
 
 DataPolisher.prototype.polish = function (data) {
+    let res;
     if (Array.isArray(data)) {
-        return this.polishArray(data);
+        res = this.polishArray(data);
     } else {
-        return this.polishObject(data);
+        res = this.polishObject(data);
     }
+    return this.handlePolishedData(res, data);
 };
 
 DataPolisher.prototype.toScalar = function (value) {
     return value.toString();
-};
-
-DataPolisher.prototype.handlePolishedObject = function (object) {
-    return object;
 };
 
 DataPolisher.prototype.toPlainObject = function (object) {
@@ -129,7 +127,7 @@ DataPolisher.prototype.polishObject = function (object, parentKey) {
             }
         }
     });
-    return this.handlePolishedObject(polishedObject, object);
+    return polishedObject;
 };
 
 DataPolisher.prototype.polishArray = function (list, varWay) {
