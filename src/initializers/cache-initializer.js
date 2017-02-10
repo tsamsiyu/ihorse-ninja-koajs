@@ -1,4 +1,4 @@
-import NodeCache from 'components/cache';
+import NodeCache from 'node-cache';
 
 export default function (app) {
     app.runCache = new NodeCache({

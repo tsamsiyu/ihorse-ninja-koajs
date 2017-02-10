@@ -21,6 +21,7 @@
     "nodemon": "^1.11.0"
   },
   "dependencies": {
+    "async": "^2.1.4",
     "babel-polyfill": "^6.20.0",
     "crypto": "0.0.3",
     "koa-bodyparser": "^3.2.0",
