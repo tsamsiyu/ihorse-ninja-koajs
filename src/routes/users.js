@@ -1,6 +1,6 @@
 import signUpAction from 'pods/users/actions/sign-up-action';
 import signInAction from 'pods/users/actions/sign-in-action';
-import mongooseDataPolisher from 'components/data-polisher/mongoose';
+import DataPolisher from 'components/data-polisher';
 
 export default function (router) {
     router.options('/sign-up', async (ctx) => {
@@ -59,9 +59,7 @@ export default function (router) {
 
     router.get('/users/current', async (ctx, next) => {
         if (ctx.req.appUser) {
-            ctx.body = mongooseDataPolisher.polish(ctx.req.appUser, {
-                ignored: ['hashedPassword', 'authToken', 'salt', 'createdAt']
-            });
+            ctx.rawBody = ctx.req.appUser;
         } else {
             ctx.throw(401);
         }

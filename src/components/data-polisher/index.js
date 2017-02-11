@@ -5,9 +5,31 @@ export default function DataPolisher(spec = {}) {
     this.spec = this.constructor.handleSpec(spec);
 }
 
-DataPolisher.polish = function (data, spec = {}) {
-    const polisher = new this(spec);
-    return polisher.polish(data);
+DataPolisher._specs = {};
+DataPolisher.register = function (name, spec) {
+    if (spec instanceof DataPolisher) {
+        this._specs[name] = spec;
+    } else {
+        this._specs[name] = new DataPolisher(spec);
+    }
+};
+
+DataPolisher.has = function (name) {
+    return Boolean(this._specs[name]);
+};
+
+DataPolisher.get = function (name) {
+    return this._specs[name];
+};
+
+DataPolisher.polish = function (name, data) {
+    if (this.has(name)) {
+        const nameChain = '';
+        return name.split(':').reduce((previous, namePart) => {
+            nameChain = nameChain ? nameChain + ':' + namePart : namePart;
+            return this.get(nameChain).polish(previous);
+        }, data);
+    }
 };
 
 DataPolisher.handleSpec = function (spec) {
@@ -18,6 +40,8 @@ DataPolisher.handleSpec = function (spec) {
         included: null
     }, spec || {});
 };
+
+// PROTOTYPE
 
 DataPolisher.prototype._diffFor = function (list, key, cb) {
     if (Array.isArray(this.spec[key]) && this.spec[key].length) {
