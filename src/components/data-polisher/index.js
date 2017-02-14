@@ -24,12 +24,16 @@ DataPolisher.get = function (name) {
 
 DataPolisher.polish = function (name, data) {
     if (this.has(name)) {
-        const nameChain = '';
-        return name.split(':').reduce((previous, namePart) => {
-            nameChain = nameChain ? nameChain + ':' + namePart : namePart;
-            return this.get(nameChain).polish(previous);
-        }, data);
+        return this.get(name).polish(data);
     }
+};
+
+DataPolisher.find = function (data) {
+    return _.find(Object.keys(this._specs), (k) => {
+        if (typeof this._specs[k].spec.applyTo === 'function') {
+            return this._specs[k].spec.applyTo.call(null, data);
+        }
+    });
 };
 
 DataPolisher.handleSpec = function (spec) {
@@ -115,20 +119,41 @@ DataPolisher.prototype.isId = function (key) {
 };
 
 DataPolisher.prototype.polish = function (data) {
-    let res;
-    if (Array.isArray(data)) {
-        res = this.polishArray(data);
-    } else {
-        res = this.polishObject(data);
+    let res = data;
+    if (typeof this.spec.before === 'string') {
+        this.spec.before = [this.spec.before];
     }
-    return this.handlePolishedData(res, data);
+    if (Array.isArray(this.spec.before)) {
+        this.spec.before.forEach((polisherName) => {
+            res = this.constructor.polish(polisherName, res);
+        });
+    }
+
+    if (Array.isArray(res)) {
+        res = this.polishArray(res);
+    } else {
+        res = this.polishObject(res);
+    }
+
+    if (typeof this.spec.after === 'string') {
+        this.spec.after = [this.spec.after];
+    }
+    if (Array.isArray(this.spec.after)) {
+        this.spec.after.forEach((polisherName) => {
+            res = this.constructor.polish(polisherName, res);
+        });
+    }
+    return res;
 };
 
 DataPolisher.prototype.toScalar = function (value) {
-    return value.toString();
+    return value !== undefined ? value.toString() : undefined;
 };
 
 DataPolisher.prototype.toPlainObject = function (object) {
+    if (this.spec.toPlainObject instanceof Function) {
+        return this.spec.toPlainObject.call(null, object);
+    }
     return object;
 };
 

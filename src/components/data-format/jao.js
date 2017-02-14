@@ -11,7 +11,7 @@ export function serialize(data, options) {
 }
 
 export function handleOptions(options) {
-    options.id = options.id ? options.id : '_id';
+    options.id = options.id ? options.id : 'id';
 }
 
 export function serializeArray(array, options) {
