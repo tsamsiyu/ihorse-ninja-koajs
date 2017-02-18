@@ -30,7 +30,6 @@ SemiStaticData.prototype.get = function (name) {
             } else {
                 this.resolve(name).then((data) => {
                     this._cache.set(cacheKey, data);
-                    // console.log(data);
                     resolve(data);
                 }, reject);
             }

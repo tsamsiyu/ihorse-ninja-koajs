@@ -11,3 +11,9 @@ export function mapFor(data, handleCb, whenCb) {
     });
     return map;
 }
+
+export function first(ary) {
+    if (ary.length) {
+        return ary[ary.length - 1];
+    }
+}

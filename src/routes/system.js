@@ -1,6 +1,7 @@
 import async from 'async';
-import {mapFor} from 'utils/enum';
+import {mapFor, first} from 'utils/enum';
 import flatten from 'lodash/flatten';
+import Data from 'components/data';
 
 export default function (router) {
     router.options('/semi-static-data', async (ctx) => {
@@ -23,11 +24,15 @@ export default function (router) {
             });
 
             ctx.body = await new Promise((resolve, reject) => {
-                async.parallel(dataResolvers, (err, data) => {
+                async.parallel(dataResolvers, (err, dataList) => {
                     if (err) {
                         reject(err);
                     } else {
-                        resolve(flatten(data));
+                        Data.specificate(dataList)
+                            .sameType()
+                            .polisher('mongoose')
+                            .throughBefore(flatten)
+                            .pass(resolve);
                     }
                 });
             });

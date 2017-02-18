@@ -1,13 +1,12 @@
-import DataPolisher from 'components/data-polisher';
-import User from 'pods/users/user';
+import DataPolisher from 'components/data/polishers/simple-polisher';
 import mongoose from 'components/mongoose';
 
 export default function (app) {
-    DataPolisher.register('user', {
-        ignored: ['authKey', 'hashedPassword', 'authToken', 'salt'],
-        before: 'mongoose',
-        applyTo(item) {
-            return item instanceof User;
+    DataPolisher.register('date', {
+        formatField(value, object, key) {
+            if (value instanceof Date) {
+                return value.toUTCString();
+            }
         }
     });
 
@@ -17,8 +16,11 @@ export default function (app) {
         toPlainObject(item) {
             return item.toObject();
         },
-        applyTo(item) {
-            return item instanceof mongoose.Model;
-        }
+        merge: 'date'
+    });
+
+    DataPolisher.register('user', {
+        ignored: ['authKey', 'hashedPassword', 'authToken', 'salt'],
+        merge: 'mongoose',
     });
 };

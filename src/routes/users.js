@@ -1,6 +1,6 @@
 import signUpAction from 'pods/users/actions/sign-up-action';
 import signInAction from 'pods/users/actions/sign-in-action';
-import DataPolisher from 'components/data-polisher';
+import Data from 'components/data';
 
 export default function (router) {
     router.options('/sign-up', async (ctx) => {
@@ -59,7 +59,7 @@ export default function (router) {
 
     router.get('/users/current', async (ctx, next) => {
         if (ctx.req.appUser) {
-            ctx.rawBody = ctx.req.appUser;
+            ctx.body = Data.specificate(ctx.req.appUser).polisher('user');
         } else {
             ctx.throw(401);
         }

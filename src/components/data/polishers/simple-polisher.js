@@ -12,6 +12,7 @@ DataPolisher.register = function (name, spec) {
     } else {
         this._specs[name] = new DataPolisher(spec);
     }
+    // console.log(name, this._specs[name].spec);
 };
 
 DataPolisher.has = function (name) {
@@ -37,6 +38,14 @@ DataPolisher.find = function (data) {
 };
 
 DataPolisher.handleSpec = function (spec) {
+    if (typeof spec === 'object' && spec.merge) {
+        spec.merge = Array.isArray(spec.merge) ? spec.merge : [spec.merge];
+        return _.mergeWith(this.get(spec.merge).spec, spec, (objValue, srcValue) => {
+            if (_.isArray(objValue)) {
+                return objValue.concat(srcValue);
+            }
+        });
+    }
     return _.merge({
         id: 'id',
         props: null,
@@ -166,6 +175,13 @@ DataPolisher.prototype.polishObject = function (object, parentKey) {
         } else {
             const varWay = parentKey ? `${parentKey}.${key}` : key;
             if (this.isAllowed(varWay)) {
+                if (this.spec.formatField instanceof Function) {
+                    const formatted = this.spec.formatField.call(null, item, handledObject, key);
+                    if (formatted) {
+                        polishedObject[key] = formatted;
+                        return;
+                    }
+                }
                 if (isScalarType(item)) {
                     polishedObject[key] = this.toScalar(item, key);
                 } else if (Array.isArray(item)) {
