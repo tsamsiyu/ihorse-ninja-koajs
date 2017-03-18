@@ -1,5 +1,5 @@
 import mongoose from 'components/mongoose';
-import {marksIndexes} from 'data/car/marks';
+//import {marksIndexes} from 'data/car/marks';
 import {bodyTypesIndexes} from 'data/car/body-types';
 import {countriesIndexes} from 'data/car/countries';
 import {fuelsIndexes} from 'data/car/fuels';
@@ -9,7 +9,8 @@ import {wheelDriveIndexes} from 'data/car/attributes';
 const {Schema} = mongoose;
 
 const schema = new Schema({
-    mark                        : {type: Number, required: true, enum: marksIndexes},
+//    mark                        : {type: Number, required: true, enum: marksIndexes},
+    
     model                       : {type: String, required: true},
     userId                      : {type: Number, required: true},
     mileage                     : {type: Number, required: true},

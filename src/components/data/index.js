@@ -7,7 +7,7 @@ import mongoose from 'components/mongoose';
 export default function Data(data, options) {
     this.data = data;
     this.options = Object.assign({
-        sameType: false,
+        sameType: true,
         type: null,
         throughBefore: [],
         throughAfter: [],
@@ -63,7 +63,7 @@ Data.prototype.getType = function (data) {
         return this.options.type;
     } else if (data instanceof mongoose.Model) {
         return data.collection.name;
-    } else if (Array.isArray(data) && this.options.sameType) {
+    } else if (Array.isArray(data) && data.length && this.options.sameType) {
         return this.getType(first(data));
     }
     return null;

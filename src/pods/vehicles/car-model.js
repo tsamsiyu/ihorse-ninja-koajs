@@ -6,4 +6,4 @@ const schema = new Schema({
     name: {type: String, unique: true, index: true, required: true},
 });
 
-export default mongoose.model('Mark', schema);
+export default mongoose.model('CarModel', schema);

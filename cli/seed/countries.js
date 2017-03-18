@@ -1,0 +1,15 @@
+export default [
+    {name: 'USA'},
+    {name: 'Germany'},
+    {name: 'France'},
+    {name: 'Portugal'},
+    {name: 'Spain'},
+    {name: 'Italy'},
+    {name: 'England'},
+    {name: 'Switzerland'},
+    {name: 'China'},
+    {name: 'Japan'},
+    {name: 'Russia'},
+    {name: 'Poland'},
+    {name: 'Belarus'},
+];
