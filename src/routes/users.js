@@ -24,10 +24,10 @@ export default function (router) {
             .then((response) => {
                 const {errors, user} = response;
                 if (errors) {
-                    ctx.body = errors;
+                    ctx.body = Data.Errors.specificate(errors);
                     ctx.status = 422;
                 } else {
-                    ctx.body = user;
+                    ctx.body = Data.specificate(user);
                     ctx.status = 201;
                 }
             })

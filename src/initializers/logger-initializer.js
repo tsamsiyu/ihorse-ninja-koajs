@@ -1,7 +1,7 @@
 import winston from 'winston';
 import stackTrace from 'stack-trace';
 
-export default function (app) {
+export default function (app, cb) {
     const consoleTransport = new winston.transports.Console({
         colorize: true,
         level: (app.env == 'development') ? 'debug' : 'error'
@@ -18,4 +18,6 @@ export default function (app) {
     app.logger = new (winston.Logger)({
         transports: [consoleTransport]
     });
+
+    cb.call();
 };

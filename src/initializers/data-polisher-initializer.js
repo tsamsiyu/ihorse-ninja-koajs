@@ -1,7 +1,7 @@
 import DataPolisher from 'components/data/polishers/simple-polisher';
 import mongoose from 'components/mongoose';
 
-export default function (app) {
+export default function (app, cb) {
     DataPolisher.register('date', {
         formatField(value, object, key) {
             if (value instanceof Date) {
@@ -23,4 +23,6 @@ export default function (app) {
         ignored: ['authKey', 'hashedPassword', 'authToken', 'salt'],
         merge: 'mongoose',
     });
+
+    cb();
 };

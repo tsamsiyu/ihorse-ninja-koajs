@@ -3,17 +3,24 @@ import {first} from 'utils/enum';
 import _ from 'components/lodash';
 import DataPolisher from 'components/data/polishers/simple-polisher';
 import mongoose from 'components/mongoose';
+import Errors from 'components/data/errors';
+import Serializable from 'components/data/serializable';
 
-export default function Data(data, options) {
-    this.data = data;
-    this.options = Object.assign({
-        sameType: true,
-        type: null,
-        throughBefore: [],
-        throughAfter: [],
-        polishers: []
-    }, options);
+export default class Data extends Serializable {
+    constructor(data, options) {
+        super();
+        this.data = data;
+        this.options = Object.assign({
+            sameType: true,
+            type: null,
+            throughBefore: [],
+            throughAfter: [],
+            polishers: []
+        }, options);
+    }
 }
+
+Data.Errors = Errors;
 
 Data.specificate = function (data, type) {
     return new Data(data, {type});

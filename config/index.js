@@ -5,7 +5,7 @@ const config = {env};
 const envConfig = require(`config/environment/${env}`);
 
 // defaults
-_.set(config, 'mongoose.server.socketOptions.keepAlive', 1);
+// _.set(config, 'mongoose.server.socketOptions.keepAlive', 1);
 _.set(config, 'debug', false);
 _.set(config, 'server.port', 80);
 

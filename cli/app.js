@@ -2,16 +2,25 @@ import loggerInitializer from 'initializers/logger-initializer';
 import mongooseInitializer from 'initializers/mongoose-initializer';
 import mongoose from 'components/mongoose';
 import seed from './seed';
+import async from 'async';
 
 export default function (config, command) {
-    const app = {config, end: config.env};
+    const app = {config, env: config.env};
 
-    loggerInitializer(app);
-    mongooseInitializer(app);
+    const initializers = [
+        loggerInitializer,
+        mongooseInitializer
+    ].map((initializer) => {
+        return (cb) => initializer(app, cb);
+    });
 
-    if (command === 'seed') {
-        seed();
-    }
-
-    mongoose.disconnect();
+    async.series(initializers, (err) => {
+        if (!err) {
+            if (command === 'seed') {
+                seed(app, () => {
+                    mongoose.disconnect();
+                });
+            }
+        }
+    });
 }

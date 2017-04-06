@@ -2,46 +2,51 @@ import marksSeeds from 'seed/marks';
 import countriesSeeds from 'seed/countries';
 import Mark from 'pods/vehicles/mark';
 import Country from 'pods/countries/country';
+import async from 'async';
 
 function seedIt(model, seeds) {
-    const name = model.modelName;
-    console.log(`\t-> '${name}' seed started`);
-    model.collection.drop();
     return new Promise((resolve, reject) => {
-        // console.log(seeds);
-        model.insertMany(seeds/*, (errs, docs) => {
-            if (errs) {
-                console.log(`\t-> '${name}' seed failed`);
-                reject(errs);
-            } else {
-                console.log(`\t-> '${name}' seed finished`);
-                resolve(docs);
-            }
-        }*/).then((docs) => {
-            console.log(`\t-> '${name}' seed finished`);
-            resolve(docs)
-        }).catch((errs) => {
-            console.log(`\t-> '${name}' seed failed`);
-            reject(errs);
+        model.deleteMany({}, (e) => {
+            if (e) return reject(e);
+            model.insertMany(seeds, (e, records) => {
+                if (e) return reject(e);
+                resolve(records);
+            });
         });
-        /*model.collection.insert(seeds, (errs, docs) => {
-            if (errs) {
-                console.log(`\t-> '${name}' seed failed`);
-                reject(errs);
-            } else {
-                console.log(`\t-> '${name}' seed finished`);
-                resolve(docs);
-            }
-        })*/
     });
 }
 
-export default function () {
-    console.log('-> seed started');
+export default function (app, finish) {
+    app.logger.info('-> seed started');
 
-    seedIt(Country, countriesSeeds).then((countries) => {
-        seedIt(Mark, marksSeeds()).then(() => {
-            console.log('-> seed finished');
-        });
-    });
+    async.reduce([
+        [Country, countriesSeeds],
+        [Mark, marksSeeds]
+    ], {},
+        (memo, item, cb) => {
+            let [model, seeds] = item;
+            try {
+                seeds = typeof seeds === 'function' ? seeds(memo) : seeds;
+            } catch (e) {
+                cb(e);
+            }
+            const start = new Date();
+            seedIt(model, seeds)
+                .then((inserted) => {
+                    const time = (new Date()).getTime() - start.getTime();
+                    app.logger.info(`  -> ${model.collection.name} seeded in ${time} ms`);
+                    memo[model.collection.name] = inserted;
+                    cb(null, memo);
+                })
+                .catch(err => cb(err));
+        },
+        (err, results) => {
+            if (err) {
+                app.logger.error('-> seed failed', err);
+            } else {
+                app.logger.info('-> seed finished');
+            }
+            finish();
+        }
+    );
 };
