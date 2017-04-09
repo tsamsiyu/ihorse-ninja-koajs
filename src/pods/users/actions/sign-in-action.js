@@ -16,7 +16,7 @@ export default function (attributes) {
                     reject(err);
                 } else if (user) {
                     if (user.encryptPassword(attributes.password) === user.hashedPassword) {
-                        resolve({user: user.pick(['id', 'email', 'authToken'])});
+                        resolve({user});
                     } else {
                         resolve({errors: {password: ['Such user does not exist']}});
                     }

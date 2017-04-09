@@ -17,7 +17,7 @@ export default function (attributes) {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve({user: user.pick(['id', 'email', 'authToken'])});
+                    resolve({user});
                 }
             });
         };

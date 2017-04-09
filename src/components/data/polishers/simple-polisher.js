@@ -12,7 +12,6 @@ DataPolisher.register = function (name, spec) {
     } else {
         this._specs[name] = new DataPolisher(spec);
     }
-    // console.log(name, this._specs[name].spec);
 };
 
 DataPolisher.has = function (name) {
@@ -23,9 +22,15 @@ DataPolisher.get = function (name) {
     return this._specs[name];
 };
 
-DataPolisher.polish = function (name, data) {
+DataPolisher.polish = function (name, data, changes) {
     if (this.has(name)) {
-        return this.get(name).polish(data);
+        if (changes) {
+            const spec = _.merge({}, this.get(name).spec, changes);
+            const polisher = new DataPolisher(spec);
+            return polisher.polish(data);
+        } else {
+            return this.get(name, changes).polish(data);
+        }
     }
 };
 
@@ -38,20 +43,56 @@ DataPolisher.find = function (data) {
 };
 
 DataPolisher.handleSpec = function (spec) {
+    let newSpec;
     if (typeof spec === 'object' && spec.merge) {
         spec.merge = Array.isArray(spec.merge) ? spec.merge : [spec.merge];
-        return _.mergeWith(this.get(spec.merge).spec, spec, (objValue, srcValue) => {
+        newSpec = {};
+        spec.merge.forEach((mergeItem) => {
+            _.assignIn(newSpec, this.get(mergeItem).spec, (objValue, srcValue) => {
+                if (_.isArray(objValue)) {
+                    return objValue.concat(srcValue);
+                }
+            });
+        });
+        _.assignIn(newSpec, spec, (objValue, srcValue) => {
             if (_.isArray(objValue)) {
                 return objValue.concat(srcValue);
             }
         });
+    } else {
+        newSpec = _.merge({
+            id: 'id',
+            props: null,
+            ignored: null,
+            included: null
+        }, spec || {});
     }
-    return _.merge({
-        id: 'id',
-        props: null,
-        ignored: null,
-        included: null
-    }, spec || {});
+    // TODO: need review polisher creation\registration process
+    if (newSpec.noignored) {
+        newSpec.noignored = Array.isArray(newSpec.noignored) ? newSpec.noignored : [newSpec.noignored];
+        if (newSpec.ignored) {
+            newSpec.ignored = _.difference(newSpec.ignored, newSpec.noignored);
+        }
+        if (newSpec.props) {
+            newSpec.props = _.difference(newSpec.props, newSpec.noignored);
+        }
+        delete newSpec.noignored;
+    }
+    if (newSpec.noincluded) {
+        newSpec.noincluded = Array.isArray(newSpec.noincluded) ? newSpec.noincluded : [newSpec.noincluded];
+        if (newSpec.included) {
+            newSpec.included = _.difference(newSpec.included, newSpec.noincluded);
+        }
+        delete newSpec.noincluded;
+    }
+    if (newSpec.noused) {
+        newSpec.noused = Array.isArray(newSpec.noused) ? newSpec.noused : [newSpec.noused];
+        if (newSpec.props) {
+            newSpec.props = _.difference(newSpec.props, newSpec.noused);
+        }
+        delete newSpec.noused;
+    }
+    return newSpec;
 };
 
 // PROTOTYPE
@@ -124,7 +165,7 @@ DataPolisher.prototype.isAllowed = function (key) {
 };
 
 DataPolisher.prototype.isId = function (key) {
-    return key == this.spec.id;
+    return key === this.spec.id;
 };
 
 DataPolisher.prototype.polish = function (data) {

@@ -11,10 +11,11 @@ export default function (app, cb) {
     });
 
     DataPolisher.register('mongoose', {
-        ignored: ['__v'],
         id: '_id',
         toPlainObject(item) {
-            return item.toObject();
+            return item.toObject({
+                versionKey: false
+            });
         },
         merge: 'date'
     });

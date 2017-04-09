@@ -27,7 +27,7 @@ export default function (router) {
                     ctx.body = Data.Errors.specificate(errors);
                     ctx.status = 422;
                 } else {
-                    ctx.body = Data.specificate(user);
+                    ctx.body = Data.specificate(user).polisher('user', {noignored: 'authToken'});
                     ctx.status = 201;
                 }
             })
@@ -41,10 +41,10 @@ export default function (router) {
             .then((response) => {
                 const {errors, user} = response;
                 if (errors) {
-                    ctx.body = errors;
+                    ctx.body = Data.Errors.specificate(errors);
                     ctx.status = 422;
                 } else {
-                    ctx.body = user;
+                    ctx.body = Data.specificate(user).polisher('user', {noignored: 'authToken'});
                     ctx.status = 200;
                 }
             })
@@ -59,7 +59,7 @@ export default function (router) {
 
     router.get('/users/current', async (ctx, next) => {
         if (ctx.req.appUser) {
-            ctx.body = Data.specificate(ctx.req.appUser).polisher('user');
+            ctx.body = Data.specificate(ctx.req.appUser).polisher('user', {noignored: 'authToken'});
         } else {
             ctx.throw(401);
         }

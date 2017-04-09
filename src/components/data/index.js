@@ -38,26 +38,30 @@ Data.prototype.buildSerializationOptions = function () {
     };
 };
 
-Data.prototype.polish = function () {
-    if (this.options.polishers.length) {
-        return _.flatten(this.options.polishers.map((polisher) => {
-            if (Array.isArray(this.data)) {
-                return this.data.map((item) => {
-                    return DataPolisher.polish(polisher, item);
-                });
-            } else {
-                return DataPolisher.polish(polisher, this.data);
-            }
-        }));
+Data.prototype.polish = function (data) {
+    this.options.polishers.forEach(([polisher, changes]) => {
+        data = this.polishItem(polisher, data, changes);
+    });
+    return data;
+};
+
+Data.prototype.polishItem = function (polisher, item, changes) {
+    if (Array.isArray(item)) {
+        item.forEach((element, k) => {
+            element[k] = this.polishItem(polisher, element, changes);
+        });
+    } else {
+        item = DataPolisher.polish(polisher, item, changes);
     }
-    return _.cloneDeep(this.data);
+    return item;
 };
 
 Data.prototype.buildData = function () {
+    let data = _.cloneDeep(this.data);
     this.options.throughBefore.forEach((stream) => {
-        this.data = stream(this.data);
+        data = stream(data);
     });
-    let data = this.polish();
+    data = this.polish(data);
     this.options.throughAfter.forEach((stream) => {
         data = stream(data);
     });
@@ -69,7 +73,7 @@ Data.prototype.getType = function (data) {
     if (this.options.type) {
         return this.options.type;
     } else if (data instanceof mongoose.Model) {
-        return data.collection.name;
+        return _.singularize(data.collection.name);
     } else if (Array.isArray(data) && data.length && this.options.sameType) {
         return this.getType(first(data));
     }
@@ -80,8 +84,8 @@ Data.prototype.pass = function (cb) {
     return cb.call(null, this);
 };
 
-Data.prototype.polisher = function (name) {
-    this.options.polishers.push(name);
+Data.prototype.polisher = function (name, changes) {
+    this.options.polishers.push([name, changes]);
     return this;
 };
 
