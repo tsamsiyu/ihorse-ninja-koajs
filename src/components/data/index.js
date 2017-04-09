@@ -48,7 +48,7 @@ Data.prototype.polish = function (data) {
 Data.prototype.polishItem = function (polisher, item, changes) {
     if (Array.isArray(item)) {
         item.forEach((element, k) => {
-            element[k] = this.polishItem(polisher, element, changes);
+            item[k] = this.polishItem(polisher, element, changes);
         });
     } else {
         item = DataPolisher.polish(polisher, item, changes);
