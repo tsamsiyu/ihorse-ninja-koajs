@@ -12,4 +12,5 @@ export default [
     {name: 'Russia'},
     {name: 'Poland'},
     {name: 'Belarus'},
+    {name: 'Korea'},
 ];

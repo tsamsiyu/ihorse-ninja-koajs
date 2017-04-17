@@ -223,12 +223,14 @@ DataPolisher.prototype.polishObject = function (object, parentKey) {
                         return;
                     }
                 }
-                if (isScalarType(item)) {
-                    polishedObject[key] = this.toScalar(item, key);
-                } else if (Array.isArray(item)) {
-                    polishedObject[key] = this.polishArray(item, varWay);
-                } else if (typeof item === 'object') {
-                    polishedObject[key] = this.polishObject(item, varWay);
+                if (item !== undefined) {
+                    if (isScalarType(item)) {
+                        polishedObject[key] = this.toScalar(item, key);
+                    } else if (Array.isArray(item)) {
+                        polishedObject[key] = this.polishArray(item, varWay);
+                    } else if (typeof item === 'object') {
+                        polishedObject[key] = this.polishObject(item, varWay);
+                    }
                 }
             }
         }
